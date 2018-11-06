@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javafx.scene.AccessibleAttribute;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.ListModel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 
@@ -100,8 +101,9 @@ public class NewJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             jButton1.setEnabled(false);
-            //從 combobox 抓出被選到的項目，存到變數裡
-            String selectedItem="";
+            //從 combobox 抓出被選到的項目，存到變數裡                   
+            String selectedItem=(String) jComboBox1.getSelectedItem(); 
+            
             /////////////////////////////////////
             URL url = new URL(selectedItem);
             String fileName = url.getFile();
@@ -109,16 +111,21 @@ public class NewJFrame extends javax.swing.JFrame {
             progress = new ProgressDialog(this);
             progress.setTitle("Downloading......");
             progress.setMessage(url.toString());
+            
             FileDownloader.downloadFile(url,
                     tempFile, new FileDownloaderCallback() {
                 @Override
                 public void totalBytesDownloaded(long bytes, boolean finished, boolean failed) {
                     //implement this
-                    if (finished) {
+                    
+                    if (finished) {                      
                         progress.setVisible(false);
                         jButton1.setEnabled(true);
-                        //將下載好的項目加入到 jList 裡面
-                        
+                        //將下載好的項目加入到 jList 裡面  
+                        DefaultListModel model = new DefaultListModel();
+                        jList1.setModel(model);
+                        model.addElement(selectedItem);
+                        jList1.updateUI();                        
                         ////////////////////////////
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
@@ -126,6 +133,8 @@ public class NewJFrame extends javax.swing.JFrame {
                                 try {
                                     URL fileURL=tempFile.toURI().toURL();
                                     //利用 fileURL 將 image icon 加到 jLabel2
+                                    ImageIcon icon = new ImageIcon(fileURL);                                   
+                                    jLabel2.setIcon(icon);
                                     ////////////////////////////////////////
                                     jList1.updateUI();
                                 } catch (Exception ex) {
